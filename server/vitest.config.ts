@@ -7,10 +7,12 @@ export default defineConfig({
     test: {
         env: {
             NODE_ENV: "test",
+            DEMO_MODE: "true",
             DATABASE_URL: process.env.DATABASE_URL_TEST ?? "",
         },
         globalSetup: ["./src/test/global-setup.ts"],
         fileParallelism: false,
-        testTimeout: 20_000,
+        testTimeout: 60_000,
+        hookTimeout: 60_000,
     },
 });

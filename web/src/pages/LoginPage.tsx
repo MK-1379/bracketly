@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useSearchParams } from "react-router";
 import { ApiError } from "../api/client";
 import { AuthLayout } from "../auth/AuthLayout";
 import type { LoginData } from "../auth/auth.api";
+import { DemoLogin } from "../auth/DemoLogin";
 import { safeRedirect } from "../auth/redirect";
 import { useCurrentUser, useLogin } from "../auth/useAuth";
 import { type FormErrors, hasErrors, validateLogin } from "../auth/validation";
@@ -31,6 +32,10 @@ export function LoginPage() {
         return <Navigate to={redirectTo} replace />;
     }
 
+    function finishLogin() {
+        navigate(redirectTo, { replace: true });
+    }
+
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
@@ -45,7 +50,7 @@ export function LoginPage() {
             return;
         }
 
-        loginMutation.mutate(data, { onSuccess: () => navigate(redirectTo, { replace: true }) });
+        loginMutation.mutate(data, { onSuccess: finishLogin });
     }
 
     return (
@@ -80,6 +85,10 @@ export function LoginPage() {
                     </Link>
                 </p>
             </form>
+
+            <div className="mt-8">
+                <DemoLogin onSuccess={finishLogin} />
+            </div>
         </AuthLayout>
     );
 }

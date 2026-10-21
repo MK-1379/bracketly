@@ -16,6 +16,8 @@ export interface RegisterData extends LoginData {
     displayName: string;
 }
 
+export type DemoRole = "organizer" | "captain";
+
 export function meQuery() {
     return queryOptions({
         queryKey: ["me"],
@@ -32,6 +34,22 @@ export function meQuery() {
         },
         staleTime: Number.POSITIVE_INFINITY,
     });
+}
+
+export function demoQuery() {
+    return queryOptions({
+        queryKey: ["demo"],
+        queryFn: async () => {
+            const data = await apiFetch<{ enabled: boolean }>("/auth/demo");
+            return data.enabled;
+        },
+        staleTime: Number.POSITIVE_INFINITY,
+    });
+}
+
+export async function loginAsDemo(role: DemoRole) {
+    const response = await apiFetch<{ user: User }>("/auth/demo", { method: "POST", body: JSON.stringify({ role }) });
+    return response.user;
 }
 
 export async function login(data: LoginData) {

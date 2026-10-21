@@ -3,6 +3,7 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { env } from "../config/env.js";
 import { prisma } from "../db/prisma.js";
+import { DEMO_ACCOUNTS } from "../demo/demoAccounts.js";
 import { HttpError } from "../errors.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { hashPassword, verifyPassword } from "./password.js";
@@ -22,6 +23,10 @@ const registerSchema = z.object({
 const loginSchema = z.object({
     email: z.email().transform((email) => email.toLowerCase()),
     password: z.string().min(1).max(72),
+});
+
+const demoLoginSchema = z.object({
+    role: z.enum(["organizer", "captain"]),
 });
 
 const authLimiter = rateLimit({
@@ -66,6 +71,24 @@ authRouter.post("/login", authLimiter, async (req, res) => {
 
     startSession(res, user.id);
     res.json({ user: { id: user.id, email: user.email, displayName: user.displayName } });
+});
+authRouter.get("/demo", (_req, res) => {
+    res.json({ enabled: env.DEMO_MODE });
+});
+
+authRouter.post("/demo", authLimiter, async (req, res) => {
+    if (!env.DEMO_MODE) {
+        throw new HttpError(404, "Not found");
+    }
+    const { role } = demoLoginSchema.parse(req.body);
+
+    const user = await prisma.user.findUnique({ where: { email: DEMO_ACCOUNTS[role] }, select: publicUser });
+    if (!user) {
+        throw new HttpError(503, "Demo data is not loaded");
+    }
+
+    startSession(res, user.id);
+    res.json({ user });
 });
 
 authRouter.post("/logout", (_req, res) => {
