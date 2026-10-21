@@ -1,7 +1,0 @@
-{
-  "devDependencies": {
-    "@biomejs/biome": "2.6.2",
-    "@types/supertest": "^7.2.1",
-    "supertest": "^7.3.1"
-  }
-}

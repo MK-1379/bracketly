@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@theme {
+    --color-bg: #10162f;
+    --color-surface: #182044;
+    --color-surface-2: #222b57;
+    --color-line: #2a3463;
+    --color-line-strong: #3a4578;
+    --color-fg: #f4f1e8;
+    --color-muted: #a8b0d0;
+    --color-accent: #ffd23f;
+    --color-live: #ff6b6b;
+
+    --font-display: "Anton", "Impact", "Arial Narrow", sans-serif;
+    --font-body: "Archivo Variable", "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+    html {
+        color-scheme: dark;
+    }
+
+    body {
+        @apply bg-bg font-body text-fg antialiased;
+    }
+
+    :focus-visible {
+        @apply outline-3 outline-offset-3 outline-accent;
+    }
+}
