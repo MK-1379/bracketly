@@ -3,7 +3,9 @@ import { prisma } from "../db/prisma.js";
 import { HttpError } from "../errors.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { uniqueSlug } from "../utils/slug.js";
-import { EDITABLE_STATUSES, findTournamentToManage } from "./tournaments.access.js";
+import { EDITABLE_STATUSES, findTournament, findTournamentToManage } from "./tournaments.access.js";
+import { matchSelect } from "../matches/matches.select.js";
+import { startTournament } from "../matches/matches.service.js";
 import {
     createTournamentSchema,
     listTournamentsSchema,
@@ -132,4 +134,28 @@ tournamentsRouter.delete("/:slug", requireAuth, async (req, res) => {
 
     await prisma.tournament.delete({ where: { id: current.id } });
     res.status(204).end();
+});
+
+tournamentsRouter.post("/:slug/start", requireAuth, async (req, res) => {
+    const { slug } = slugParamsSchema.parse(req.params);
+    const tournament = await findTournamentToManage(slug, req.userId);
+    if (tournament.status !== "REGISTRATION") {
+        throw new HttpError(409, "Only a tournament with open registration can start");
+    }
+
+    await startTournament(tournament.id);
+    res.json({ status: "IN_PROGRESS" });
+});
+
+tournamentsRouter.get("/:slug/matches", async (req, res) => {
+    const { slug } = slugParamsSchema.parse(req.params);
+    const tournament = await findTournament(slug);
+
+    const matches = await prisma.match.findMany({
+        where: { tournamentId: tournament.id },
+        select: matchSelect,
+        orderBy: [{ round: "asc" }, { position: "asc" }],
+    });
+
+    res.json({ matches });
 });

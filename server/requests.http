@@ -112,3 +112,24 @@ Content-Type: application/json
 
 ### Retirar inscripción
 DELETE {{api}}/tournaments/{{slug}}/registrations/1
+
+### Iniciar
+POST {{api}}/tournaments/{{slug}}/start
+
+### Partidos
+GET {{api}}/tournaments/{{slug}}/matches
+
+### Reportar (capitán)
+POST {{api}}/matches/2/report
+Content-Type: application/json
+
+{ "scoreA": 1, "scoreB": 2, "proofUrl": "https://i.imgur.com/ejemplo.png" }
+
+### Confirmar lo reportado (organizador)
+POST {{api}}/matches/2/confirm
+
+### Introducir el resultado directamente (organizador)
+POST {{api}}/matches/6/confirm
+Content-Type: application/json
+
+{ "scoreA": 2, "scoreB": 0 }
