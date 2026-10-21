@@ -36,7 +36,7 @@ All bodies are JSON. Authentication uses an `httpOnly` cookie called `session`, 
 | GET | `/tournaments/mine` | User | | `200 { tournaments }` organized by the user, drafts included, newest first |
 | GET | `/tournaments/:slug` | Public | | `200 { tournament }` with accepted teams |
 | POST | `/tournaments` | User | `name`, `gameId`, `startsAt`, `maxTeams` (2-64), `teamSize` (1-10), `bestOf` (1, 3, 5), `description?`, `rules?` | `201 { tournament }` as `DRAFT` |
-| PATCH | `/tournaments/:slug` | Organizer | Any field of the create body | `200 { tournament }` (only before it starts) |
+| PATCH | `/tournaments/:slug` | Organizer | Any field of the create body | `200 { tournament }` (only before it starts; `409` if `maxTeams` is lower than the accepted teams) |
 | POST | `/tournaments/:slug/open` | Organizer | | `200 { tournament }` as `REGISTRATION` |
 | POST | `/tournaments/:slug/start` | Organizer | | `200` creates the bracket, status `IN_PROGRESS` |
 | DELETE | `/tournaments/:slug` | Organizer | | `204` (only before it starts) |

@@ -110,6 +110,15 @@ tournamentsRouter.patch("/:slug", requireAuth, async (req, res) => {
         await assertGameExists(data.gameId);
     }
 
+    if (data.maxTeams !== undefined) {
+        const accepted = await prisma.registration.count({
+            where: { tournamentId: current.id, status: "ACCEPTED" },
+        });
+        if (data.maxTeams < accepted) {
+            throw new HttpError(409, `There are already ${accepted} accepted teams`);
+        }
+    }
+
     const tournament = await prisma.tournament.update({
         where: { id: current.id },
         data,

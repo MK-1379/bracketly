@@ -11,6 +11,7 @@ export const matchSelect = {
     nextMatchId: true,
     nextSlot: true,
     winnerTeamId: true,
+    reportedBy: { select: { displayName: true } },
     updatedAt: true,
     teamA: teamInMatch,
     teamB: teamInMatch,

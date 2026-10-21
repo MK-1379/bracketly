@@ -1,6 +1,7 @@
+import request from "supertest";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "../db/prisma.js";
-import { gameId, resetDatabase, signUp } from "./helpers.js";
+import { app, gameId, resetDatabase, signUp } from "./helpers.js";
 
 beforeEach(resetDatabase);
 afterAll(() => prisma.$disconnect());
@@ -60,7 +61,7 @@ describe("mis partidos", () => {
     });
 
     it("muestra quién reportó y desaparece al confirmarse", async () => {
-        const { organizer, alpha, bravo } = await startedFinal();
+        const { organizer, slug, alpha, bravo } = await startedFinal();
         const stranger = await signUp("stranger");
         const [match] = (await alpha.agent.get("/api/matches/mine")).body.matches;
 
@@ -72,6 +73,9 @@ describe("mis partidos", () => {
             scoreB: 1,
             reportedBy: { displayName: "bravo" },
         });
+
+        const publicMatches = await request(app).get(`/api/tournaments/${slug}/matches`);
+        expect(publicMatches.body.matches[0].reportedBy).toEqual({ displayName: "bravo" });
 
         expect((await stranger.agent.get("/api/matches/mine")).body.matches).toEqual([]);
 

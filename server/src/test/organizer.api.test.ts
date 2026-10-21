@@ -49,3 +49,32 @@ describe("panel del organizador", () => {
         });
     });
 });
+
+describe("editar torneo", () => {
+    it("no deja bajar el máximo de equipos por debajo de los aceptados", async () => {
+        const organizer = await signUp("organizer");
+        const slug = await createDraft(organizer, "Copa Editable");
+        await organizer.agent.post(`/api/tournaments/${slug}/open`);
+        for (const name of ["alpha", "bravo", "charlie"]) {
+            const captain = await signUp(name);
+            const team = await captain.agent.post("/api/teams").send({ name, tag: name.slice(0, 3) });
+            await captain.agent.post(`/api/tournaments/${slug}/registrations`).send({ teamId: team.body.team.id });
+            await organizer.agent
+                .patch(`/api/tournaments/${slug}/registrations/${team.body.team.id}`)
+                .send({ status: "ACCEPTED" });
+        }
+
+        const tooSmall = await organizer.agent.patch(`/api/tournaments/${slug}`).send({ maxTeams: 2 });
+        expect(tooSmall.status).toBe(409);
+
+        const renamed = await organizer.agent
+            .patch(`/api/tournaments/${slug}`)
+            .send({ name: "Copa Editada", maxTeams: 4, rules: "Sin trampas" });
+        expect(renamed.body.tournament).toMatchObject({
+            slug,
+            name: "Copa Editada",
+            maxTeams: 4,
+            rules: "Sin trampas",
+        });
+    });
+});
