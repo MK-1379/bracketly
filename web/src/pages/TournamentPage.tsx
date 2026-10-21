@@ -78,7 +78,7 @@ export function TournamentPage() {
             content: (
                 <div className="flex max-w-prose flex-col gap-4 leading-relaxed whitespace-pre-line text-muted">
                     {data.description && <p>{data.description}</p>}
-                    <p>{data.rules ?? "El organizador no ha publicado reglas."}</p>
+                    <p>{data.rules || "El organizador no ha publicado reglas."}</p>
                 </div>
             ),
         },

@@ -1,7 +1,7 @@
 interface OptionGroupProps<T extends number | string> {
     label: string;
     name: string;
-    options: { value: T; label: string }[];
+    options: { value: T; label: string; disabled?: boolean }[];
     value: T;
     hint?: string;
     onChange: (value: T) => void;
@@ -22,13 +22,14 @@ export function OptionGroup<T extends number | string>({
                 {options.map((option) => (
                     <label
                         key={option.value}
-                        className="grid min-h-11 min-w-11 cursor-pointer place-items-center border-2 border-line-strong px-4 text-sm font-bold uppercase tracking-wider text-muted transition hover:border-fg hover:text-fg has-checked:border-accent has-checked:bg-accent has-checked:text-bg has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent"
+                        className="grid min-h-11 min-w-11 cursor-pointer place-items-center border-2 border-line-strong px-4 text-sm font-bold uppercase tracking-wider text-muted transition hover:border-fg hover:text-fg has-checked:border-accent has-checked:bg-accent has-checked:text-bg has-disabled:pointer-events-none has-disabled:opacity-40 has-focus-visible:outline-3 has-focus-visible:outline-offset-3 has-focus-visible:outline-accent"
                     >
                         <input
                             type="radio"
                             name={name}
                             value={option.value}
                             checked={option.value === value}
+                            disabled={option.disabled}
                             onChange={() => onChange(option.value)}
                             className="sr-only"
                         />

@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import { RequireAuth } from "./auth/RequireAuth";
 import { Layout } from "./components/Layout";
+import { EditTournamentPage } from "./pages/EditTournamentPage";
 import { HomePage } from "./pages/HomePage";
 import { JoinTeamPage } from "./pages/JoinTeamPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
                     { path: "panel", element: <PanelPage /> },
                     { path: "panel/torneos/nuevo", element: <NewTournamentPage /> },
                     { path: "panel/torneos/:slug", element: <ManageTournamentPage /> },
+                    { path: "panel/torneos/:slug/editar", element: <EditTournamentPage /> },
                     { path: "panel/equipos/nuevo", element: <NewTeamPage /> },
                     { path: "panel/equipos/:id", element: <TeamPanelPage /> },
                     { path: "unirse/:code", element: <JoinTeamPage /> },

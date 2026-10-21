@@ -75,3 +75,15 @@ export function reviewRegistration({
         body: JSON.stringify({ status }),
     });
 }
+
+export async function updateTournament({ slug, data }: { slug: string; data: Partial<TournamentData> }) {
+    const { tournament } = await apiFetch<{ tournament: TournamentDetail }>(slugPath(slug), {
+        method: "PATCH",
+        body: JSON.stringify(data),
+    });
+    return tournament;
+}
+
+export function confirmMatch({ matchId, scoreA, scoreB }: { matchId: number; scoreA?: number; scoreB?: number }) {
+    return apiFetch(`/matches/${matchId}/confirm`, { method: "POST", body: JSON.stringify({ scoreA, scoreB }) });
+}

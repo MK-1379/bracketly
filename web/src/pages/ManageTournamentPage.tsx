@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router";
-import { tournamentQuery } from "../api/queries";
+import { matchesQuery, tournamentQuery } from "../api/queries";
 import { useCurrentUser } from "../auth/useAuth";
 import { buttonClass } from "../components/buttonClass";
 import { PanelSection } from "../components/PanelSection";
 import { RegistrationsTable } from "../organizer/RegistrationsTable";
+import { ResultsPanel } from "../organizer/ResultsPanel";
 import { StatCard } from "../organizer/StatCard";
 import { StatusSteps } from "../organizer/StatusSteps";
 import { TournamentActions } from "../organizer/TournamentActions";
@@ -17,6 +18,8 @@ export function ManageTournamentPage() {
     const tournament = useQuery(tournamentQuery(slug));
     const isOrganizer = tournament.data?.organizer.id === user?.id;
     const registrations = useRegistrations(slug, isOrganizer);
+    const started = tournament.data?.status === "IN_PROGRESS" || tournament.data?.status === "FINISHED";
+    const matches = useQuery({ ...matchesQuery(slug), enabled: isOrganizer && started });
 
     if (tournament.isPending) {
         return <div className="mx-auto h-64 max-w-6xl px-4 py-10" aria-busy="true" />;
@@ -37,6 +40,7 @@ export function ManageTournamentPage() {
 
     const data = tournament.data;
     const pending = registrations.data?.filter((registration) => registration.status === "PENDING").length ?? 0;
+    const toValidate = matches.data?.filter((match) => match.status === "REPORTED").length ?? 0;
 
     return (
         <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10">
@@ -51,16 +55,27 @@ export function ManageTournamentPage() {
                     </p>
                     <h1 className="font-display text-5xl leading-none uppercase sm:text-6xl">{data.name}</h1>
                 </div>
-                <Link to={`/torneos/${data.slug}`} className={buttonClass("outline")}>
-                    Ver página pública
-                </Link>
+                <div className="flex flex-wrap gap-3">
+                    {!started && (
+                        <Link to={`/panel/torneos/${data.slug}/editar`} className={buttonClass("outline")}>
+                            Editar
+                        </Link>
+                    )}
+                    <Link to={`/torneos/${data.slug}`} className={buttonClass("outline")}>
+                        Ver página pública
+                    </Link>
+                </div>
             </div>
 
             <StatusSteps status={data.status} />
 
             <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                 <StatCard label="Equipos aceptados" value={`${data._count.registrations}/${data.maxTeams}`} />
-                <StatCard label="Por revisar" value={String(pending)} highlight={pending > 0} />
+                {started ? (
+                    <StatCard label="Por validar" value={String(toValidate)} highlight={toValidate > 0} />
+                ) : (
+                    <StatCard label="Por revisar" value={String(pending)} highlight={pending > 0} />
+                )}
                 <StatCard label="Formato" value={`${data.teamSize}v${data.teamSize} · BO${data.bestOf}`} />
                 <StatCard label="Empieza" value={formatDate(data.startsAt)} />
             </dl>
@@ -68,6 +83,20 @@ export function ManageTournamentPage() {
             <PanelSection title="Estado del torneo">
                 <TournamentActions tournament={data} />
             </PanelSection>
+
+            {data.status === "IN_PROGRESS" && (
+                <PanelSection title="Resultados">
+                    {matches.isPending && (
+                        <div className="h-24 border border-line bg-surface motion-safe:animate-pulse" />
+                    )}
+                    {matches.isError && (
+                        <p role="alert" className="text-live">
+                            No se han podido cargar los partidos. Recarga la página.
+                        </p>
+                    )}
+                    {matches.isSuccess && <ResultsPanel tournament={data} matches={matches.data} />}
+                </PanelSection>
+            )}
 
             <PanelSection title="Inscripciones">
                 {registrations.isPending && (

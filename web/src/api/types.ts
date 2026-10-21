@@ -53,6 +53,7 @@ export interface Match {
     nextMatchId: number | null;
     nextSlot: "A" | "B" | null;
     winnerTeamId: number | null;
+    reportedBy: { displayName: string } | null;
     updatedAt: string;
     teamA: TeamSummary | null;
     teamB: TeamSummary | null;

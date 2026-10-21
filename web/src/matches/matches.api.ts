@@ -4,7 +4,6 @@ import type { Match } from "../api/types";
 
 export interface MyMatch extends Match {
     canReport: boolean;
-    reportedBy: { displayName: string } | null;
     tournament: { slug: string; name: string; bestOf: number; _count: { matches: number } };
 }
 

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+    confirmMatch,
     createTournament,
     deleteTournament,
     myTournamentsQuery,
@@ -7,6 +8,7 @@ import {
     registrationsQuery,
     reviewRegistration,
     startTournament,
+    updateTournament,
 } from "./organizer.api";
 
 export function useMyTournaments() {
@@ -57,5 +59,22 @@ export function useDeleteTournament() {
             queryClient.removeQueries({ queryKey: ["tournament", slug] });
             return queryClient.invalidateQueries({ queryKey: ["tournaments"] });
         },
+    });
+}
+
+export function useUpdateTournament(slug: string) {
+    return useTournamentMutation(slug, updateTournament);
+}
+
+export function useConfirmMatch(slug: string) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: confirmMatch,
+        onSuccess: () =>
+            Promise.all([
+                queryClient.invalidateQueries({ queryKey: ["tournament", slug] }),
+                queryClient.invalidateQueries({ queryKey: ["tournaments"] }),
+                queryClient.invalidateQueries({ queryKey: ["matches", "mine"] }),
+            ]),
     });
 }
