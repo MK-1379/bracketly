@@ -5,3 +5,5 @@ coverage/
 *.log
 .DS_Store
 server/src/generated/
+test-results/
+playwright-report/
