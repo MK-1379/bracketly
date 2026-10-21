@@ -1,0 +1,142 @@
+generator client {
+    provider = "prisma-client"
+    output = "../src/generated/prisma"
+}
+
+datasource db {
+    provider = "mysql"
+}
+
+enum TournamentStatus {
+    DRAFT
+  REGISTRATION
+  IN_PROGRESS
+  FINISHED
+}
+
+enum RegistrationStatus {
+    PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum MatchStatus {
+    PENDING
+  READY
+  REPORTED
+  CONFIRMED
+}
+
+enum Slot {
+    A
+  B
+}
+
+model User {
+  id                   Int @id @default (autoincrement())
+  email                String @unique @db.VarChar(255)
+  passwordHash         String @db.VarChar(255)
+  displayName          String @db.VarChar(40)
+  createdAt            DateTime @default (now())
+  organizedTournaments Tournament[]
+  captainOf            Team[]
+  memberships          TeamMember[]
+  reportedMatches      Match[]      @relation("ReportedBy")
+}
+
+model Game {
+  id          Int @id @default (autoincrement())
+  slug        String @unique @db.VarChar(40)
+  name        String @db.VarChar(60)
+  logoUrl     String ? @db.VarChar(255)
+  tournaments Tournament[]
+}
+
+model Tournament {
+  id            Int @id @default (autoincrement())
+  slug          String @unique @db.VarChar(80)
+  name          String @db.VarChar(80)
+  description   String ? @db.Text
+  rules         String ? @db.Text
+  startsAt      DateTime
+  maxTeams      Int
+  teamSize      Int
+  bestOf        Int
+  status        TournamentStatus @default (DRAFT)
+  createdAt     DateTime @default (now())
+  gameId        Int
+  game          Game @relation(fields: [gameId], references: [id])
+  organizerId   Int
+  organizer     User @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  winnerTeamId  Int ?
+        winnerTeam    Team ? @relation("TournamentWinner", fields: [winnerTeamId], references: [id], onDelete: SetNull)
+  registrations Registration[]
+  matches       Match[]
+
+    @@index([status])
+}
+
+model Team {
+  id             Int @id @default (autoincrement())
+  name           String @db.VarChar(40)
+  tag            String @db.VarChar(5)
+  inviteCode     String @unique @db.VarChar(32)
+  createdAt      DateTime @default (now())
+  captainId      Int
+  captain        User @relation(fields: [captainId], references: [id], onDelete: Cascade)
+  members        TeamMember[]
+  registrations  Registration[]
+  wonTournaments Tournament[]   @relation("TournamentWinner")
+  matchesAsA     Match[]        @relation("TeamA")
+  matchesAsB     Match[]        @relation("TeamB")
+  matchesWon     Match[]        @relation("Winner")
+}
+
+model TeamMember {
+  teamId   Int
+  userId   Int
+  joinedAt DateTime @default (now())
+  team     Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@id([teamId, userId])
+}
+
+model Registration {
+  tournamentId Int
+  teamId       Int
+  status       RegistrationStatus @default (PENDING)
+  seed         Int ?
+        createdAt    DateTime @default (now())
+  tournament   Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  team         Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+    @@id([tournamentId, teamId])
+}
+
+model Match {
+  id              Int @id @default (autoincrement())
+  round           Int
+  position        Int
+  scoreA          Int ?
+        scoreB          Int ?
+            status          MatchStatus @default (PENDING)
+  proofUrl        String ? @db.VarChar(255)
+  updatedAt       DateTime @updatedAt
+  tournamentId    Int
+  tournament      Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  teamAId         Int ?
+        teamA           Team ? @relation("TeamA", fields: [teamAId], references: [id], onDelete: SetNull)
+  teamBId         Int ?
+        teamB           Team ? @relation("TeamB", fields: [teamBId], references: [id], onDelete: SetNull)
+  winnerTeamId    Int ?
+        winnerTeam      Team ? @relation("Winner", fields: [winnerTeamId], references: [id], onDelete: SetNull)
+  nextMatchId     Int ?
+        nextMatch       Match ? @relation("Bracket", fields: [nextMatchId], references: [id], onDelete: SetNull)
+  previousMatches Match[]     @relation("Bracket")
+  nextSlot        Slot ?
+        reportedById    Int ?
+            reportedBy      User ? @relation("ReportedBy", fields: [reportedById], references: [id], onDelete: SetNull)
+
+            @@unique([tournamentId, round, position])
+}
