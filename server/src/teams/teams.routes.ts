@@ -26,7 +26,18 @@ export const teamsRouter = Router();
 teamsRouter.get("/mine", requireAuth, async (req, res) => {
     const teams = await prisma.team.findMany({
         where: { members: { some: { userId: req.userId } } },
-        select: { ...teamPublic, captainId: true, inviteCode: true },
+        select: {
+            ...teamPublic,
+            captainId: true,
+            inviteCode: true,
+            registrations: {
+                select: {
+                    status: true,
+                    tournament: { select: { slug: true, name: true, status: true, startsAt: true, teamSize: true } },
+                },
+                orderBy: { createdAt: "desc" },
+            },
+        },
         orderBy: { createdAt: "asc" },
     });
 

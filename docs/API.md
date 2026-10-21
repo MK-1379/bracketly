@@ -57,7 +57,7 @@ Tournament status: `DRAFT` → `REGISTRATION` → `IN_PROGRESS` → `FINISHED`.
 | Method | Path | Access | Body | Response |
 |---|---|---|---|---|
 | POST | `/teams` | User | `name` (2-40), `tag` (2-5 letters or numbers) | `201 { team }` with `inviteCode` |
-| GET | `/teams/mine` | User | | `200 { teams }` (`inviteCode` only for the captain) |
+| GET | `/teams/mine` | User | | `200 { teams }` with members and registrations (`inviteCode` only for the captain) |
 | GET | `/teams/:id` | Public | | `200 { team }` with members |
 | POST | `/teams/:id/invite-code` | Captain | | `200 { inviteCode }` (the old one stops working) |
 | DELETE | `/teams/:id/members/:userId` | Captain, or the member themselves | | `204` |
