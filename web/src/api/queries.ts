@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { apiFetch } from "./client";
-import type { Game, TournamentFilters, TournamentSummary, Match, TournamentDetail } from "./types";
+import type { Game, Match, TournamentDetail, TournamentFilters, TournamentSummary } from "./types";
 
 export function gamesQuery() {
     return queryOptions({
