@@ -64,6 +64,16 @@ tournamentsRouter.get("/", async (req, res) => {
     res.json({ tournaments });
 });
 
+tournamentsRouter.get("/mine", requireAuth, async (req, res) => {
+    const tournaments = await prisma.tournament.findMany({
+        where: { organizerId: currentUserId(req) },
+        select: tournamentSummary,
+        orderBy: { createdAt: "desc" },
+    });
+
+    res.json({ tournaments });
+});
+
 tournamentsRouter.get("/:slug", async (req, res) => {
     const { slug } = slugParamsSchema.parse(req.params);
     const tournament = await prisma.tournament.findUnique({

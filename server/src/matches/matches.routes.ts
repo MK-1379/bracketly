@@ -2,7 +2,7 @@ import { Router } from "express";
 import { isValidScore } from "../bracket/score.js";
 import { prisma } from "../db/prisma.js";
 import { HttpError } from "../errors.js";
-import { requireAuth, currentUserId } from "../middleware/requireAuth.js";
+import { currentUserId, requireAuth } from "../middleware/requireAuth.js";
 import { confirmMatchSchema, matchParamsSchema, reportMatchSchema } from "./matches.schemas.js";
 import { matchSelect } from "./matches.select.js";
 import { confirmMatch } from "./matches.service.js";

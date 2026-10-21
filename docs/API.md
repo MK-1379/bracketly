@@ -33,6 +33,7 @@ All bodies are JSON. Authentication uses an `httpOnly` cookie called `session`, 
 | Method | Path | Access | Body / query | Response |
 |---|---|---|---|---|
 | GET | `/tournaments` | Public | `?game=<slug>&status=<status>` | `200 { tournaments }` (drafts are hidden) |
+| GET | `/tournaments/mine` | User | | `200 { tournaments }` organized by the user, drafts included, newest first |
 | GET | `/tournaments/:slug` | Public | | `200 { tournament }` with accepted teams |
 | POST | `/tournaments` | User | `name`, `gameId`, `startsAt`, `maxTeams` (2-64), `teamSize` (1-10), `bestOf` (1, 3, 5), `description?`, `rules?` | `201 { tournament }` as `DRAFT` |
 | PATCH | `/tournaments/:slug` | Organizer | Any field of the create body | `200 { tournament }` (only before it starts) |
@@ -47,7 +48,7 @@ Tournament status: `DRAFT` → `REGISTRATION` → `IN_PROGRESS` → `FINISHED`.
 
 | Method | Path | Access | Body | Response |
 |---|---|---|---|---|
-| GET | `/tournaments/:slug/registrations` | Organizer | | `200 { registrations }` |
+| GET | `/tournaments/:slug/registrations` | Organizer | | `200 { registrations }` with each team's captain and member count |
 | POST | `/tournaments/:slug/registrations` | Team captain | `teamId` | `201 { registration }` as `PENDING` |
 | PATCH | `/tournaments/:slug/registrations/:teamId` | Organizer | `status`: `ACCEPTED` or `REJECTED` | `200 { registration }` |
 | DELETE | `/tournaments/:slug/registrations/:teamId` | Team captain | | `204` |

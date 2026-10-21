@@ -4,7 +4,9 @@ import { Layout } from "./components/Layout";
 import { HomePage } from "./pages/HomePage";
 import { JoinTeamPage } from "./pages/JoinTeamPage";
 import { LoginPage } from "./pages/LoginPage";
+import { ManageTournamentPage } from "./pages/ManageTournamentPage";
 import { NewTeamPage } from "./pages/NewTeamPage";
+import { NewTournamentPage } from "./pages/NewTournamentPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { PanelPage } from "./pages/PanelPage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -24,6 +26,8 @@ export const router = createBrowserRouter([
                 element: <RequireAuth />,
                 children: [
                     { path: "panel", element: <PanelPage /> },
+                    { path: "panel/torneos/nuevo", element: <NewTournamentPage /> },
+                    { path: "panel/torneos/:slug", element: <ManageTournamentPage /> },
                     { path: "panel/equipos/nuevo", element: <NewTeamPage /> },
                     { path: "panel/equipos/:id", element: <TeamPanelPage /> },
                     { path: "unirse/:code", element: <JoinTeamPage /> },

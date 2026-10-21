@@ -1,14 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "./Button";
+import type { ButtonVariant } from "./buttonClass";
 
 interface ConfirmButtonProps {
     label: string;
     question: string;
     pending?: boolean;
+    disabled?: boolean;
+    variant?: ButtonVariant;
     onConfirm: () => void;
 }
 
-export function ConfirmButton({ label, question, pending = false, onConfirm }: ConfirmButtonProps) {
+export function ConfirmButton({
+    label,
+    question,
+    pending = false,
+    disabled = false,
+    variant = "danger",
+    onConfirm,
+}: ConfirmButtonProps) {
     const [asking, setAsking] = useState(false);
     const cancelRef = useRef<HTMLButtonElement>(null);
 
@@ -20,7 +30,7 @@ export function ConfirmButton({ label, question, pending = false, onConfirm }: C
 
     if (!asking) {
         return (
-            <Button variant="danger" disabled={pending} onClick={() => setAsking(true)}>
+            <Button variant={variant} disabled={pending || disabled} onClick={() => setAsking(true)}>
                 {pending ? "..." : label}
             </Button>
         );
@@ -30,7 +40,7 @@ export function ConfirmButton({ label, question, pending = false, onConfirm }: C
         <span className="flex flex-wrap items-center gap-2">
             <span className="text-sm font-semibold">{question}</span>
             <Button
-                variant="danger"
+                variant={variant}
                 onClick={() => {
                     setAsking(false);
                     onConfirm();

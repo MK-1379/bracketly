@@ -3,6 +3,7 @@ import { useCurrentUser } from "../auth/useAuth";
 import { buttonClass } from "../components/buttonClass";
 import { PanelSection } from "../components/PanelSection";
 import { UpcomingMatches } from "../matches/UpcomingMatches";
+import { MyTournaments } from "../organizer/MyTournaments";
 import { TeamCard } from "../teams/TeamCard";
 import { useMyTeams } from "../teams/useTeams";
 
@@ -20,6 +21,17 @@ export function PanelPage() {
 
             <PanelSection title="Próximos partidos">
                 <UpcomingMatches />
+            </PanelSection>
+
+            <PanelSection
+                title="Mis torneos"
+                action={
+                    <Link to="/panel/torneos/nuevo" className={buttonClass("primary")}>
+                        Crear torneo
+                    </Link>
+                }
+            >
+                <MyTournaments />
             </PanelSection>
 
             <PanelSection

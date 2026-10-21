@@ -25,7 +25,15 @@ registrationsRouter.get("/", requireAuth, async (req, res) => {
             status: true,
             seed: true,
             createdAt: true,
-            team: { select: { id: true, name: true, tag: true, _count: { select: { members: true } } } },
+            team: {
+                select: {
+                    id: true,
+                    name: true,
+                    tag: true,
+                    captain: { select: { displayName: true } },
+                    _count: { select: { members: true } },
+                },
+            },
         },
         orderBy: { createdAt: "asc" },
     });

@@ -3,13 +3,18 @@ import type { TournamentSummary } from "../api/types";
 import { formatDate } from "../utils/format";
 import { StatusBadge } from "./StatusBadge";
 
-export function TournamentCard({ tournament }: { tournament: TournamentSummary }) {
+interface TournamentCardProps {
+    tournament: TournamentSummary;
+    to?: string;
+}
+
+export function TournamentCard({ tournament, to = `/torneos/${tournament.slug}` }: TournamentCardProps) {
     const teams = tournament._count.registrations;
     const fill = Math.min(100, (teams / tournament.maxTeams) * 100);
 
     return (
         <Link
-            to={`/torneos/${tournament.slug}`}
+            to={to}
             className="flex flex-col gap-4 border border-line bg-surface p-5 transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:border-accent hover:shadow-[4px_4px_0_var(--color-accent)]"
         >
             <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-widest">
