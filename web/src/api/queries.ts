@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { apiFetch } from "./client";
-import type { Game, TournamentFilters, TournamentSummary } from "./types";
+import type { Game, TournamentFilters, TournamentSummary, Match, TournamentDetail } from "./types";
 
 export function gamesQuery() {
     return queryOptions({
@@ -24,5 +24,21 @@ export function tournamentsQuery(filters: TournamentFilters) {
         queryKey: ["tournaments", filters],
         queryFn: () => apiFetch<{ tournaments: TournamentSummary[] }>(`/tournaments?${params}`),
         select: (data) => data.tournaments,
+    });
+}
+
+export function tournamentQuery(slug: string) {
+    return queryOptions({
+        queryKey: ["tournament", slug],
+        queryFn: () => apiFetch<{ tournament: TournamentDetail }>(`/tournaments/${encodeURIComponent(slug)}`),
+        select: (data) => data.tournament,
+    });
+}
+
+export function matchesQuery(slug: string) {
+    return queryOptions({
+        queryKey: ["tournament", slug, "matches"],
+        queryFn: () => apiFetch<{ matches: Match[] }>(`/tournaments/${encodeURIComponent(slug)}/matches`),
+        select: (data) => data.matches,
     });
 }
