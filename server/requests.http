@@ -22,3 +22,54 @@ POST {{api}}/auth/register
 Content-Type: application/json
 
 { "email": "mal", "password": "123" }
+
+### Juegos
+GET {{api}}/games
+
+### Crear torneo
+POST {{api}}/tournaments
+Content-Type: application/json
+
+{
+    "name": "Copa de Otoño",
+    "gameId": 1,
+    "startsAt": "2027-01-10T18:00:00Z",
+    "maxTeams": 8,
+    "teamSize": 5,
+    "bestOf": 3,
+    "rules": "Sin trampas"
+}
+
+### Crear torneo con datos inválidos
+POST {{api}}/tournaments
+Content-Type: application/json
+
+{ "name": "x", "gameId": 1, "startsAt": "2020-01-01", "maxTeams": 1, "teamSize": 5, "bestOf": 2 }
+
+### Lista pública
+GET {{api}}/tournaments
+
+### Lista filtrada
+GET {{api}}/tournaments?game=league-of-legends&status=REGISTRATION
+
+### Ver un torneo (cambia el slug por el tuyo)
+@slug = copa-de-otono-xxxxxx
+GET {{api}}/tournaments/{{slug}}
+
+### Editar
+PATCH {{api}}/tournaments/{{slug}}
+Content-Type: application/json
+
+{ "maxTeams": 16 }
+
+### Abrir inscripciones
+POST {{api}}/tournaments/{{slug}}/open
+
+### Borrar
+DELETE {{api}}/tournaments/{{slug}}
+
+### Login con el segundo usuario
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "otro@test.com", "password": "supersecreta" }

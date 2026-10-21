@@ -4,6 +4,8 @@ import { z, ZodError } from "zod";
 import { authRouter } from "./auth/auth.routes.js";
 import { prisma } from "./db/prisma.js";
 import { HttpError } from "./errors.js";
+import { gamesRouter } from "./games/games.routes.js";
+import { tournamentsRouter } from "./tournaments/tournaments.routes.js";
 
 export function createApp() {
     const app = express();
@@ -17,6 +19,8 @@ export function createApp() {
     });
 
     app.use("/api/auth", authRouter);
+    app.use("/api/games", gamesRouter);
+    app.use("/api/tournaments", tournamentsRouter);
 
     app.use((_req, res) => {
         res.status(404).json({ error: "Not found" });
