@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { prisma } from "../db/prisma.js";
 import { HttpError } from "../errors.js";
-import { requireAuth } from "../middleware/requireAuth.js";
-import { uniqueSlug } from "../utils/slug.js";
-import { EDITABLE_STATUSES, findTournament, findTournamentToManage } from "./tournaments.access.js";
 import { matchSelect } from "../matches/matches.select.js";
 import { startTournament } from "../matches/matches.service.js";
+import { currentUserId, requireAuth } from "../middleware/requireAuth.js";
+import { uniqueSlug } from "../utils/slug.js";
+import { EDITABLE_STATUSES, findTournament, findTournamentToManage } from "./tournaments.access.js";
 import {
     createTournamentSchema,
     listTournamentsSchema,
@@ -33,7 +33,7 @@ const tournamentDetail = {
     rules: true,
     createdAt: true,
     winnerTeam: { select: { id: true, name: true, tag: true } },
-        registrations: {
+    registrations: {
         where: { status: "ACCEPTED" },
         select: { seed: true, team: { select: { id: true, name: true, tag: true } } },
         orderBy: { createdAt: "asc" },
@@ -81,7 +81,7 @@ tournamentsRouter.post("/", requireAuth, async (req, res) => {
     await assertGameExists(data.gameId);
 
     const tournament = await prisma.tournament.create({
-        data: { ...data, slug: uniqueSlug(data.name), organizerId: req.userId! },
+        data: { ...data, slug: uniqueSlug(data.name), organizerId: currentUserId(req) },
         select: tournamentDetail,
     });
 

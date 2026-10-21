@@ -9,7 +9,10 @@ const score = z.number().int().min(0);
 export const reportMatchSchema = z.object({
     scoreA: score,
     scoreB: score,
-    proofUrl: z.url({ protocol: /^https?$/ }).max(255).optional(),
+    proofUrl: z
+        .url({ protocol: /^https?$/ })
+        .max(255)
+        .optional(),
 });
 
 export const confirmMatchSchema = z.object({

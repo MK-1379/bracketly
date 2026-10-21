@@ -1,14 +1,14 @@
 import cookieParser from "cookie-parser";
 import express, { type NextFunction, type Request, type Response } from "express";
-import { z, ZodError } from "zod";
+import { ZodError, z } from "zod";
 import { authRouter } from "./auth/auth.routes.js";
 import { prisma } from "./db/prisma.js";
 import { HttpError } from "./errors.js";
 import { gamesRouter } from "./games/games.routes.js";
-import { tournamentsRouter } from "./tournaments/tournaments.routes.js";
+import { matchesRouter } from "./matches/matches.routes.js";
 import { registrationsRouter } from "./registrations/registrations.routes.js";
 import { joinRouter, teamsRouter } from "./teams/teams.routes.js";
-import { matchesRouter } from "./matches/matches.routes.js";
+import { tournamentsRouter } from "./tournaments/tournaments.routes.js";
 
 export function createApp() {
     const app = express();

@@ -1,0 +1,23 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
+    "files": {
+        "includes": ["**", "!dist", "!src/generated"]
+    },
+    "formatter": {
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120
+    },
+    "linter": {
+        "rules": {
+            "preset": "recommended"
+        }
+    },
+    "assist": {
+        "actions": {
+            "source": {
+                "organizeImports": "on"
+            }
+        }
+    }
+}

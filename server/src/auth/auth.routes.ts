@@ -1,6 +1,7 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
+import { env } from "../config/env.js";
 import { prisma } from "../db/prisma.js";
 import { HttpError } from "../errors.js";
 import { requireAuth } from "../middleware/requireAuth.js";
@@ -10,7 +11,10 @@ import { endSession, startSession } from "./session.js";
 const publicUser = { id: true, email: true, displayName: true } as const;
 
 const registerSchema = z.object({
-    email: z.email().max(255).transform((email) => email.toLowerCase()),
+    email: z
+        .email()
+        .max(255)
+        .transform((email) => email.toLowerCase()),
     password: z.string().min(8).max(72),
     displayName: z.string().trim().min(3).max(40),
 });
@@ -26,6 +30,7 @@ const authLimiter = rateLimit({
     standardHeaders: "draft-8",
     legacyHeaders: false,
     message: { error: "Too many attempts, try again later" },
+    skip: () => env.NODE_ENV === "test",
 });
 
 export const authRouter = Router();

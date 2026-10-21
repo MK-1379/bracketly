@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { Router } from "express";
 import { prisma } from "../db/prisma.js";
 import { HttpError } from "../errors.js";
-import { requireAuth } from "../middleware/requireAuth.js";
+import { currentUserId, requireAuth } from "../middleware/requireAuth.js";
 import { findTeamAsCaptain } from "./teams.access.js";
 import { createTeamSchema, inviteParamsSchema, memberParamsSchema, teamParamsSchema } from "./teams.schemas.js";
 
@@ -50,7 +50,7 @@ teamsRouter.get("/:id", async (req, res) => {
 
 teamsRouter.post("/", requireAuth, async (req, res) => {
     const data = createTeamSchema.parse(req.body);
-    const userId = req.userId!;
+    const userId = currentUserId(req);
 
     const team = await prisma.team.create({
         data: {
@@ -105,7 +105,7 @@ export const joinRouter = Router();
 
 joinRouter.post("/:code", requireAuth, async (req, res) => {
     const { code } = inviteParamsSchema.parse(req.params);
-    const userId = req.userId!;
+    const userId = currentUserId(req);
 
     const team = await prisma.team.findUnique({ where: { inviteCode: code } });
     if (!team) {
