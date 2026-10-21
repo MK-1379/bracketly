@@ -1,10 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router";
-
-function navClass({ isActive }: { isActive: boolean }) {
-    return `relative py-1 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:origin-left after:bg-accent after:transition-transform ${
-        isActive ? "after:scale-x-100" : "after:scale-x-0 hover:after:scale-x-100"
-    }`;
-}
+import { navClass } from "./navClass";
+import { UserMenu } from "./UserMenu";
 
 export function Layout() {
     return (
@@ -16,11 +12,12 @@ export function Layout() {
                     </Link>
                     <nav
                         aria-label="Principal"
-                        className="flex items-center gap-6 text-sm font-semibold uppercase tracking-widest"
+                        className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold uppercase tracking-widest"
                     >
                         <NavLink to="/" end className={navClass}>
                             Torneos
                         </NavLink>
+                        <UserMenu />
                     </nav>
                 </div>
             </header>
