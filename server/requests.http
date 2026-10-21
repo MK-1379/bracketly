@@ -73,3 +73,42 @@ POST {{api}}/auth/login
 Content-Type: application/json
 
 { "email": "otro@test.com", "password": "supersecreta" }
+
+### Crear equipo
+POST {{api}}/teams
+Content-Type: application/json
+
+{ "name": "Lobos", "tag": "lob" }
+
+### Mis equipos
+GET {{api}}/teams/mine
+
+### Ver equipo
+GET {{api}}/teams/1
+
+### Unirse (con el inviteCode que te dio "Crear equipo")
+POST {{api}}/join/PEGA-AQUI-EL-CODIGO
+
+### Nuevo código de invitación
+POST {{api}}/teams/1/invite-code
+
+### Salir del equipo / expulsar (userId del jugador)
+DELETE {{api}}/teams/1/members/3
+
+### Inscribir equipo
+POST {{api}}/tournaments/{{slug}}/registrations
+Content-Type: application/json
+
+{ "teamId": 1 }
+
+### Ver inscripciones (organizador)
+GET {{api}}/tournaments/{{slug}}/registrations
+
+### Aceptar
+PATCH {{api}}/tournaments/{{slug}}/registrations/1
+Content-Type: application/json
+
+{ "status": "ACCEPTED" }
+
+### Retirar inscripción
+DELETE {{api}}/tournaments/{{slug}}/registrations/1

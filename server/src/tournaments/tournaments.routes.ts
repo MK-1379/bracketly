@@ -3,6 +3,7 @@ import { prisma } from "../db/prisma.js";
 import { HttpError } from "../errors.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { uniqueSlug } from "../utils/slug.js";
+import { EDITABLE_STATUSES, findTournamentToManage } from "./tournaments.access.js";
 import {
     createTournamentSchema,
     listTournamentsSchema,
@@ -30,20 +31,12 @@ const tournamentDetail = {
     rules: true,
     createdAt: true,
     winnerTeam: { select: { id: true, name: true, tag: true } },
+        registrations: {
+        where: { status: "ACCEPTED" },
+        select: { seed: true, team: { select: { id: true, name: true, tag: true } } },
+        orderBy: { createdAt: "asc" },
+    },
 } as const;
-
-const EDITABLE_STATUSES = ["DRAFT", "REGISTRATION"];
-
-async function findTournamentToManage(slug: string, userId: number | undefined) {
-    const tournament = await prisma.tournament.findUnique({ where: { slug } });
-    if (!tournament) {
-        throw new HttpError(404, "Tournament not found");
-    }
-    if (tournament.organizerId !== userId) {
-        throw new HttpError(403, "Only the organizer can do this");
-    }
-    return tournament;
-}
 
 async function assertGameExists(gameId: number) {
     const game = await prisma.game.findUnique({ where: { id: gameId } });

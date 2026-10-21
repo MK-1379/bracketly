@@ -6,6 +6,8 @@ import { prisma } from "./db/prisma.js";
 import { HttpError } from "./errors.js";
 import { gamesRouter } from "./games/games.routes.js";
 import { tournamentsRouter } from "./tournaments/tournaments.routes.js";
+import { registrationsRouter } from "./registrations/registrations.routes.js";
+import { joinRouter, teamsRouter } from "./teams/teams.routes.js";
 
 export function createApp() {
     const app = express();
@@ -20,7 +22,10 @@ export function createApp() {
 
     app.use("/api/auth", authRouter);
     app.use("/api/games", gamesRouter);
+    app.use("/api/tournaments/:slug/registrations", registrationsRouter);
     app.use("/api/tournaments", tournamentsRouter);
+    app.use("/api/teams", teamsRouter);
+    app.use("/api/join", joinRouter);
 
     app.use((_req, res) => {
         res.status(404).json({ error: "Not found" });
