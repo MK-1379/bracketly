@@ -19,8 +19,16 @@ export function TournamentHero({ tournament }: { tournament: TournamentDetail })
                 <span className="text-muted first-letter:uppercase">{formatDate(tournament.startsAt)}</span>
             </div>
             <h1 className="font-display text-6xl leading-none uppercase text-balance sm:text-8xl">
-                {firstLine}
-                {secondLine && <span className="block text-accent">{secondLine}</span>}
+                <span className="-mt-[0.15em] block overflow-hidden pt-[0.15em] pb-[0.04em]">
+                    <span className="inline-block motion-safe:animate-rise">{firstLine}</span>
+                </span>
+                {secondLine && (
+                    <span className="-mt-[0.15em] block overflow-hidden pt-[0.15em] pb-[0.04em]">
+                        <span className="inline-block text-accent motion-safe:animate-rise [animation-delay:0.12s]">
+                            {secondLine}
+                        </span>
+                    </span>
+                )}
             </h1>
             <p className="max-w-prose text-muted">
                 Organiza <strong className="text-fg">{tournament.organizer.displayName}</strong> ·{" "}

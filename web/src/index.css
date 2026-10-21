@@ -13,6 +13,46 @@
 
     --font-display: "Anton", "Impact", "Arial Narrow", sans-serif;
     --font-body: "Archivo Variable", "Helvetica Neue", Arial, sans-serif;
+
+    --animate-rise: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    --animate-enter: enter 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    --animate-draw: draw 0.7s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    --animate-ticker: ticker 40s linear infinite;
+    --animate-flip: flip 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+
+    @keyframes rise {
+        from {
+            transform: translateY(105%);
+        }
+    }
+
+    @keyframes enter {
+        from {
+            opacity: 0;
+            transform: translateX(-14px);
+        }
+    }
+
+    @keyframes draw {
+        from {
+            stroke-dashoffset: 1;
+        }
+    }
+
+    @keyframes ticker {
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    @keyframes flip {
+        from {
+            transform: rotateY(0);
+        }
+        to {
+            transform: rotateY(180deg);
+        }
+    }
 }
 
 @layer base {

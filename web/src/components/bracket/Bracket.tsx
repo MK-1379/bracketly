@@ -1,6 +1,8 @@
+import { useState } from "react";
 import type { Match, TeamSummary } from "../../api/types";
 import {
     CARD_HEIGHT,
+    CARD_WIDTH,
     COLUMN_GAP,
     columnX,
     connectorPath,
@@ -11,9 +13,14 @@ import {
     teamColor,
     winnerOf,
 } from "../../utils/bracket";
+import { ChampionCard } from "./ChampionCard";
 import { MatchCard } from "./MatchCard";
 
 const CHAMPION_WIDTH = 220;
+
+function entranceDelay(round: number, position: number) {
+    return `${0.15 + round * 0.2 + position * 0.05}s`;
+}
 
 interface BracketProps {
     matches: Match[];
@@ -21,6 +28,8 @@ interface BracketProps {
 }
 
 export function Bracket({ matches, champion }: BracketProps) {
+    const [highlightedTeam, setHighlightedTeam] = useState<number | null>(null);
+
     const totalRounds = Math.max(...matches.map((match) => match.round));
     const firstRoundMatches = matches.filter((match) => match.round === 1).length;
     const rounds = Array.from({ length: totalRounds }, (_, index) => index + 1);
@@ -53,6 +62,8 @@ export function Bracket({ matches, champion }: BracketProps) {
                 <svg className="pointer-events-none absolute inset-0" width={width} height={height} aria-hidden="true">
                     {matches.map((match) => {
                         const winner = winnerOf(match);
+                        const highlighted = highlightedTeam !== null && winner?.id === highlightedTeam;
+                        const dimmed = highlightedTeam !== null && !highlighted;
                         return (
                             <path
                                 key={match.id}
@@ -61,37 +72,48 @@ export function Bracket({ matches, champion }: BracketProps) {
                                     match.nextMatchId ? byId.get(match.nextMatchId) : undefined,
                                     championX,
                                 )}
+                                pathLength={1}
                                 fill="none"
-                                strokeWidth={2}
-                                className={winner ? "stroke-accent" : "stroke-line-strong"}
+                                strokeWidth={highlighted ? 3 : 2}
+                                className={`transition-[stroke,opacity] duration-300 motion-safe:animate-draw ${
+                                    winner ? "stroke-accent" : "stroke-line-strong"
+                                } ${dimmed ? "opacity-25" : ""}`}
+                                style={{
+                                    strokeDasharray: 1,
+                                    stroke: highlighted && winner ? teamColor(winner.id) : undefined,
+                                    animationDelay: `${0.6 + match.round * 0.25}s`,
+                                }}
                             />
                         );
                     })}
                 </svg>
 
                 {matches.map((match) => (
-                    <MatchCard key={match.id} match={match} />
+                    <MatchCard
+                        key={match.id}
+                        match={match}
+                        highlightedTeam={highlightedTeam}
+                        onHighlight={setHighlightedTeam}
+                        className="absolute motion-safe:animate-enter"
+                        style={{
+                            left: columnX(match.round),
+                            top: matchCenterY(match.round, match.position) - CARD_HEIGHT / 2,
+                            width: CARD_WIDTH,
+                            animationDelay: entranceDelay(match.round, match.position),
+                        }}
+                    />
                 ))}
 
-                <div
-                    className={`absolute flex flex-col justify-center gap-2 p-5 text-bg ${champion ? "bg-fg" : "bg-accent"}`}
+                <ChampionCard
+                    champion={champion}
                     style={{
+                        position: "absolute",
                         left: championX,
                         top: finalCenterY - CARD_HEIGHT / 2 - 20,
                         width: CHAMPION_WIDTH - COLUMN_GAP / 2,
-                        minHeight: CARD_HEIGHT + 40,
+                        height: CARD_HEIGHT + 40,
                     }}
-                >
-                    {champion ? (
-                        <>
-                            <span className="text-xs font-bold uppercase tracking-widest">Campeón</span>
-                            <span className="font-display text-3xl leading-none uppercase">{champion.name}</span>
-                            <span className="h-2 w-full" style={{ backgroundColor: teamColor(champion.id) }} />
-                        </>
-                    ) : (
-                        <span className="font-display text-3xl leading-none uppercase">¿Quién levanta la copa?</span>
-                    )}
-                </div>
+                />
             </div>
         </div>
     );
