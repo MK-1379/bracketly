@@ -1,0 +1,77 @@
+import { Router } from "express";
+import rateLimit from "express-rate-limit";
+import { z } from "zod";
+import { prisma } from "../db/prisma.js";
+import { HttpError } from "../errors.js";
+import { requireAuth } from "../middleware/requireAuth.js";
+import { hashPassword, verifyPassword } from "./password.js";
+import { endSession, startSession } from "./session.js";
+
+const publicUser = { id: true, email: true, displayName: true } as const;
+
+const registerSchema = z.object({
+    email: z.email().max(255).transform((email) => email.toLowerCase()),
+    password: z.string().min(8).max(72),
+    displayName: z.string().trim().min(3).max(40),
+});
+
+const loginSchema = z.object({
+    email: z.email().transform((email) => email.toLowerCase()),
+    password: z.string().min(1).max(72),
+});
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: { error: "Too many attempts, try again later" },
+});
+
+export const authRouter = Router();
+
+authRouter.post("/register", authLimiter, async (req, res) => {
+    const data = registerSchema.parse(req.body);
+
+    const existing = await prisma.user.findUnique({ where: { email: data.email } });
+    if (existing) {
+        throw new HttpError(409, "Email already registered");
+    }
+
+    const user = await prisma.user.create({
+        data: {
+            email: data.email,
+            displayName: data.displayName,
+            passwordHash: await hashPassword(data.password),
+        },
+        select: publicUser,
+    });
+
+    startSession(res, user.id);
+    res.status(201).json({ user });
+});
+
+authRouter.post("/login", authLimiter, async (req, res) => {
+    const data = loginSchema.parse(req.body);
+
+    const user = await prisma.user.findUnique({ where: { email: data.email } });
+    if (!user || !(await verifyPassword(data.password, user.passwordHash))) {
+        throw new HttpError(401, "Invalid email or password");
+    }
+
+    startSession(res, user.id);
+    res.json({ user: { id: user.id, email: user.email, displayName: user.displayName } });
+});
+
+authRouter.post("/logout", (_req, res) => {
+    endSession(res);
+    res.status(204).end();
+});
+
+authRouter.get("/me", requireAuth, async (req, res) => {
+    const user = await prisma.user.findUnique({ where: { id: req.userId }, select: publicUser });
+    if (!user) {
+        throw new HttpError(401, "Not authenticated");
+    }
+    res.json({ user });
+});

@@ -1,0 +1,24 @@
+@api = http://localhost:3001/api
+
+### Registro
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{ "email": "ana@test.com", "password": "supersecreta", "displayName": "Ana" }
+
+### Login
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "ana@test.com", "password": "supersecreta" }
+
+### Quién soy
+GET {{api}}/auth/me
+
+POST {{api}}/auth/logout
+
+### Registro con datos inválidos
+POST {{api}}/auth/register
+Content-Type: application/json
+
+{ "email": "mal", "password": "123" }
