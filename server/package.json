@@ -11,7 +11,8 @@
     "start": "node dist/index.js",
     "test": "vitest run",
     "db:migrate": "prisma migrate dev",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "db:seed": "prisma db seed"
   },
   "keywords": [],
   "author": "",
