@@ -2,7 +2,7 @@ import { Router } from "express";
 import { isValidScore } from "../bracket/score.js";
 import { prisma } from "../db/prisma.js";
 import { HttpError } from "../errors.js";
-import { requireAuth } from "../middleware/requireAuth.js";
+import { requireAuth, currentUserId } from "../middleware/requireAuth.js";
 import { confirmMatchSchema, matchParamsSchema, reportMatchSchema } from "./matches.schemas.js";
 import { matchSelect } from "./matches.select.js";
 import { confirmMatch } from "./matches.service.js";
@@ -34,6 +34,38 @@ function assertValidScore(bestOf: number, scoreA: number, scoreB: number) {
 }
 
 export const matchesRouter = Router();
+
+const teamWithCaptain = { select: { id: true, name: true, tag: true, captainId: true } } as const;
+
+matchesRouter.get("/mine", requireAuth, async (req, res) => {
+    const userId = currentUserId(req);
+    const myTeam = { members: { some: { userId } } };
+
+    const matches = await prisma.match.findMany({
+        where: {
+            status: { in: ["READY", "REPORTED"] },
+            tournament: { status: "IN_PROGRESS" },
+            OR: [{ teamA: myTeam }, { teamB: myTeam }],
+        },
+        select: {
+            ...matchSelect,
+            teamA: teamWithCaptain,
+            teamB: teamWithCaptain,
+            reportedBy: { select: { displayName: true } },
+            tournament: {
+                select: { slug: true, name: true, bestOf: true, _count: { select: { matches: true } } },
+            },
+        },
+        orderBy: [{ tournament: { startsAt: "asc" } }, { round: "asc" }, { position: "asc" }],
+    });
+
+    res.json({
+        matches: matches.map((match) => ({
+            ...match,
+            canReport: match.teamA?.captainId === userId || match.teamB?.captainId === userId,
+        })),
+    });
+});
 
 matchesRouter.post("/:id/report", requireAuth, async (req, res) => {
     const { id } = matchParamsSchema.parse(req.params);

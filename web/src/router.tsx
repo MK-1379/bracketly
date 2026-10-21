@@ -8,6 +8,7 @@ import { NewTeamPage } from "./pages/NewTeamPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { PanelPage } from "./pages/PanelPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { ReportMatchPage } from "./pages/ReportMatchPage";
 import { TeamPanelPage } from "./pages/TeamPanelPage";
 import { TournamentPage } from "./pages/TournamentPage";
 
@@ -26,6 +27,7 @@ export const router = createBrowserRouter([
                     { path: "panel/equipos/nuevo", element: <NewTeamPage /> },
                     { path: "panel/equipos/:id", element: <TeamPanelPage /> },
                     { path: "unirse/:code", element: <JoinTeamPage /> },
+                    { path: "partidos/:id/reportar", element: <ReportMatchPage /> },
                 ],
             },
             { path: "*", element: <NotFoundPage /> },

@@ -67,6 +67,7 @@ Tournament status: `DRAFT` → `REGISTRATION` → `IN_PROGRESS` → `FINISHED`.
 
 | Method | Path | Access | Body | Response |
 |---|---|---|---|---|
+| GET | `/matches/mine` | User | | `200 { matches }` still to be played (`READY` or `REPORTED`) by the user's teams, with `tournament`, `reportedBy` and `canReport` (captain of either team) |
 | POST | `/matches/:id/report` | Captain of either team | `scoreA`, `scoreB`, `proofUrl?` (http or https) | `200 { match }` as `REPORTED` |
 | POST | `/matches/:id/confirm` | Organizer | `scoreA?`, `scoreB?` (defaults to the reported score) | `200 { match }` as `CONFIRMED`; the winner moves to the next match |
 
