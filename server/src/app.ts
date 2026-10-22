@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { ZodError, z } from "zod";
 import { authRouter } from "./auth/auth.routes.js";
+import { env } from "./config/env.js";
 import { prisma } from "./db/prisma.js";
 import { HttpError } from "./errors.js";
 import { gamesRouter } from "./games/games.routes.js";
@@ -9,7 +10,6 @@ import { matchesRouter } from "./matches/matches.routes.js";
 import { registrationsRouter } from "./registrations/registrations.routes.js";
 import { joinRouter, teamsRouter } from "./teams/teams.routes.js";
 import { tournamentsRouter } from "./tournaments/tournaments.routes.js";
-import { env } from "./config/env.js";
 
 export function createApp() {
     const app = express();
@@ -52,5 +52,3 @@ export function createApp() {
 
     return app;
 }
-
-
