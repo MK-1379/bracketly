@@ -8,7 +8,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     ports:
-      - "3309:3306"
+      - "127.0.0.1:3309:3306"
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
@@ -16,6 +16,48 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+
+  migrate:
+    profiles: [app]
+    build:
+      context: ./server
+      target: build
+    command: ["sh", "-c", "npx prisma migrate deploy && npm run db:seed && npm run db:demo"]
+    environment:
+      DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    profiles: [app]
+    build: ./server
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      DEMO_MODE: ${DEMO_MODE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  web:
+    profiles: [app]
+    build: ./web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8081}:80"
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   db-data:

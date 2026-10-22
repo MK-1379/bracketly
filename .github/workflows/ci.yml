@@ -106,3 +106,12 @@ jobs:
           name: playwright-report
           path: web/playwright-report/
           retention-days: 7
+          
+  docker:
+    name: Imágenes Docker
+    runs-on: ubuntu-latest
+    needs: [server, web]
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker build -t bracketly-api ./server
+      - run: docker build -t bracketly-web ./web

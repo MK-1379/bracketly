@@ -9,9 +9,13 @@ import { matchesRouter } from "./matches/matches.routes.js";
 import { registrationsRouter } from "./registrations/registrations.routes.js";
 import { joinRouter, teamsRouter } from "./teams/teams.routes.js";
 import { tournamentsRouter } from "./tournaments/tournaments.routes.js";
+import { env } from "./config/env.js";
 
 export function createApp() {
     const app = express();
+
+    app.disable("x-powered-by");
+    app.set("trust proxy", env.TRUST_PROXY);
 
     app.use(express.json());
     app.use(cookieParser());
@@ -48,3 +52,5 @@ export function createApp() {
 
     return app;
 }
+
+
