@@ -131,3 +131,7 @@ On every push, GitHub Actions runs Biome, the build and the tests of both parts,
 ## Security
 
 See [SECURITY.md](SECURITY.md) to report a vulnerability.
+
+## License
+
+The source code is released under the [MIT License](LICENSE).
